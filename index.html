@@ -27,7 +27,7 @@
                 width: 35vw;
                 height: 35vh;
 
-                border: 6px inset #4b4b4b;
+                border: 5px inset #858585;
                 background-color: #f4f4f4;
                 font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
@@ -79,7 +79,7 @@
     </head>
     <body onload="start()">
         <video playsinline autoplay muted></video>
-        <div id="menu">
+        <div id="menu" style="display: block;">
             <!--Options Menu-->
             <div id="title-wrapper">
                 <h3>Options</h3>
@@ -89,7 +89,6 @@
             <div id="buttons">
                 <div id="reversecam">
                     <button data-num="1" style="background-image: url('icons/error.svg');" onclick="clicked(1)">
-                        
                     </button>
                 </div>
                 <div id="flip">
@@ -98,12 +97,10 @@
                 </div>
                 <div id="rotatecw">
                     <button data-num="3" style="background-image: url('icons/error.svg');" onclick="clicked(3)">
-                        
                     </button>
                 </div>
                 <div id="rotateccw">
                     <button data-num="4" style="background-image: url('icons/error.svg');" onclick="clicked(4)">
-                        
                     </button>
                 </div>
             </div>
@@ -118,7 +115,7 @@
                     "4": "url(\"./icons/rotate_ccw_"
                 };
 
-            var facing = "user"
+            var facing = "usr";
 
             document.querySelectorAll("button").forEach(element => {
                 new ResizeObserver(() => {
@@ -133,6 +130,21 @@
                         console.log("grown ", element.getAttribute("data-num"));
                     }
                 }).observe(element)
+            });
+
+            document.addEventListener("keydown", event => {
+                console.log("keypress")
+                if (event.code == "Escape")
+                    if (menu.style.display == "block")
+                    {
+                        menu.style.display = "none";
+                        video.style.cursor = "none";
+                    }
+                    else
+                    {
+                        menu.style.display = "block"
+                        video.style.cursor = "pointer";
+                    }
             })
 
             function start()
@@ -142,7 +154,7 @@
                     navigator.mediaDevices.getUserMedia({
                         audio: false,
                         video: {
-                            facingMode: "environment" //set to "environment" to use outer facing camera
+                            facingMode: "user" //set to "environment" to use outer facing camera
                         }
                     })
                     .then(stream => {
@@ -150,7 +162,7 @@
                         let track = video.srcObject.getTracks()[0];
                         track.getSettings
                         ? console.log(track.getSettings())
-                        : console.warn("Size not available!")
+                        : console.warn("Settings not available!")
                     })
                     
                 }
@@ -167,10 +179,36 @@
                 {
                     case 1:
                         // Switch camera
-                        facing == "user"
-                        ? facing = "environment"
-                        : facing = "user"
-                        start()
+                        if (facing == "usr")
+                        {
+                            stream = navigator.mediaDevices.getUserMedia({
+                                audio: false,
+                                video: {
+                                    facingMode: "environment" //set to "environment" to use outer facing camera
+                                }
+                            });
+                            facing = "env"
+                        }
+                        else
+                        {
+                            stream = navigator.mediaDevices.getUserMedia({
+                                audio: false,
+                                video: {
+                                    facingMode: "environment" //set to "environment" to use outer facing camera
+                                }
+                            });
+                            facing = "usr"
+                        }
+
+
+                        stream.getTracks().forEach(track => track.stop());
+
+
+
+                        video.srcObject = null;
+                        video.srcObject = stream;
+                        video.play();
+
                         break;
                     case 2:
                         break;
