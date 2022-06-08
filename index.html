@@ -142,7 +142,7 @@
                     navigator.mediaDevices.getUserMedia({
                         audio: false,
                         video: {
-                            facingMode: facing //set to "environment" to use outer facing camera
+                            facingMode: "environment" //set to "environment" to use outer facing camera
                         }
                     })
                     .then(stream => {
