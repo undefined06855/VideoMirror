@@ -158,11 +158,7 @@
                         }
                     })
                     .then(stream => {
-                        video.srcObject = stream;
-                        let track = video.srcObject.getTracks()[0];
-                        track.getSettings
-                        ? console.log(track.getSettings())
-                        : console.warn("Settings not available!")
+                        update("1n", stream);
                     })
                     
                 }
@@ -179,35 +175,33 @@
                 {
                     case 1:
                         // Switch camera
+
                         if (facing == "usr")
                         {
-                            stream = navigator.mediaDevices.getUserMedia({
+                            navigator.mediaDevices.getUserMedia({
                                 audio: false,
                                 video: {
                                     facingMode: "environment" //set to "environment" to use outer facing camera
                                 }
+                            })
+                            .then(stream => {
+                                facing = "env";
+                                update("2e", stream);
                             });
-                            facing = "env"
                         }
                         else
                         {
-                            stream = navigator.mediaDevices.getUserMedia({
+                            navigator.mediaDevices.getUserMedia({
                                 audio: false,
                                 video: {
-                                    facingMode: "environment" //set to "environment" to use outer facing camera
+                                    facingMode: "user" //set to "environment" to use outer facing camera
                                 }
+                            })
+                            .then(stream => {
+                                facing = "usr";
+                                update("2u", stream);
                             });
-                            facing = "usr"
                         }
-
-
-                        stream.getTracks().forEach(track => track.stop());
-
-
-
-                        video.srcObject = null;
-                        video.srcObject = stream;
-                        video.play();
 
                         break;
                     case 2:
@@ -220,6 +214,15 @@
                         console.warn ("Erronious parameter passed to function!")
                 }
                 console.log("clicked %s", btn)
+            }
+
+            function update(uid, rstream)
+            {
+                video.srcObject = null;
+                video.srcObject = rstream;
+                video.play();
+
+                console.log("Updated", uid, "with ", video.srcObject.getTracks()[0].getSettings());
             }
 
         </script>
