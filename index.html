@@ -259,6 +259,7 @@
                     catch(e)
                     {
                         console.warn("Error encountered, oldstream might not be updated (currently at %s)\nFull error:\n\t%s", oldstream, e)
+                        alert(e);
                     }
                 }
                 video.srcObject = null;
