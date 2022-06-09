@@ -115,7 +115,10 @@
                     "4": "url(\"./icons/rotate_ccw_"
                 };
 
-            var facing = "usr";
+            var facing = "usr"
+              , oldstream = -1
+              , flipped = false
+              , rotation = 0;
 
             document.querySelectorAll("button").forEach(element => {
                 new ResizeObserver(() => {
@@ -169,6 +172,15 @@
                 }
             }
 
+            function updateTransforms()
+            {
+                video.style.transform = ""
+                flipped 
+                ? video.style.transform += "rotateZ(" + rotation + "turn) scaleX(-1)"
+                : video.style.transform += "rotateZ(" + rotation + "turn) scaleX(1)"
+                console.log(rotation)
+            }
+
             function clicked (btn)
             {
                 switch (btn)
@@ -205,19 +217,50 @@
 
                         break;
                     case 2:
+                        //Flip left-right
+
+                        if(flipped) flipped = false;
+                        else        flipped = true;
+
+                        updateTransforms();
                         break;
                     case 3:
+                        //Rotate clockwise
+                        rotation += .25;
+                        updateTransforms();
                         break;
                     case 4:
+                        //Rotate anticlockwise
+                        rotation -= .25;
+                        updateTransforms();
                         break;
                     default:
-                        console.warn ("Erronious parameter passed to function!")
+                        console.warn("Erronious parameter passed to function!");
                 }
-                console.log("clicked %s", btn)
+                console.log("clicked %s", btn);
             }
 
             function update(uid, rstream)
             {
+                if (uid == "1n")
+                {
+                    //Initial startup
+                    oldstream = rstream;
+                }
+                else
+                {
+                    try
+                    {
+                        oldstream.getTracks().forEach(track => {
+                            track.stop();
+                            console.log("Tracks stopped");
+                        })
+                    }
+                    catch(e)
+                    {
+                        console.warn("Error encountered, oldstream might not be updated (currently at %s)\nFull error:\n\t%s", oldstream, e)
+                    }
+                }
                 video.srcObject = null;
                 video.srcObject = rstream;
                 video.play();
